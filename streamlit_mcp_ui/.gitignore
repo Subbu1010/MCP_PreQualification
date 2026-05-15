@@ -1,0 +1,6 @@
+# MCP references: (Streamlit UI — local dev cache / venv)
+# Purpose: Ignore virtualenv and caches for the separate UI project.
+.venv/
+__pycache__/
+*.pyc
+.env

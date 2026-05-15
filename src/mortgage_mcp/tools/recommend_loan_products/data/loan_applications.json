@@ -1,0 +1,28 @@
+{
+  "applications": [
+    {
+      "application_id": "APP-50021",
+      "borrower_id": "BRW-10001",
+      "loan_purpose": "PURCHASE",
+      "occupancy": "PRIMARY",
+      "property_type": "SFR",
+      "loan_amount": 450000,
+      "appraised_value": 550000,
+      "subordinate_financing": 0,
+      "loan_type": "CONVENTIONAL",
+      "monthly_pitia": 2650
+    },
+    {
+      "application_id": "APP-50022",
+      "borrower_id": "BRW-10002",
+      "loan_purpose": "PURCHASE",
+      "occupancy": "PRIMARY",
+      "property_type": "SFR",
+      "loan_amount": 485000,
+      "appraised_value": 550000,
+      "subordinate_financing": 0,
+      "loan_type": "CONVENTIONAL",
+      "monthly_pitia": 3100
+    }
+  ]
+}

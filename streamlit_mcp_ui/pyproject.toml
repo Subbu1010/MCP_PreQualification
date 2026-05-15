@@ -1,0 +1,20 @@
+# MCP references: (Streamlit UI only — HTTP client to mortgage MCP server)
+# Purpose: Optional editable install; you can instead use `requirements.txt` only.
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mortgage-mcp-streamlit-ui"
+version = "0.1.0"
+description = "Streamlit UI for the Mortgage Eligibility MCP server (Streamable HTTP client)."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "streamlit>=1.40.0",
+  "mcp>=1.21.0",
+  "python-dotenv>=1.0.0",
+]
+
+[tool.setuptools]
+py-modules = ["mcp_client"]

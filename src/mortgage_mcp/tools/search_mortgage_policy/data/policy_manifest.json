@@ -1,0 +1,32 @@
+[
+  {
+    "path": "fha_credit_mock.txt",
+    "document_id": "POL-FHA-HANDBOOK-4000.1-MOCK",
+    "source": "FHA",
+    "section": "II.A.1.b Credit requirements (mock excerpt)"
+  },
+  {
+    "path": "fannie_dti_mock.txt",
+    "document_id": "FNMA-SELLING-GUIDE-MOCK",
+    "source": "FNMA",
+    "section": "B3-6-02 Debt-to-income ratios (mock excerpt)"
+  },
+  {
+    "path": "freddie_ltv_mock.txt",
+    "document_id": "FREDDIE-GUIDE-MOCK",
+    "source": "FREDDIE",
+    "section": "LTV / occupancy (mock excerpt)"
+  },
+  {
+    "path": "cfpb_disclosures_mock.txt",
+    "document_id": "CFPB-RESPA-TILA-MOCK",
+    "source": "CFPB",
+    "section": "Disclosure expectations (mock advisory text)"
+  },
+  {
+    "path": "internal_credit_policy_mock.md",
+    "document_id": "INTERNAL-CREDIT-POLICY-MOCK",
+    "source": "INTERNAL",
+    "section": "Institution overlay (mock)"
+  }
+]

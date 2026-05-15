@@ -1,0 +1,58 @@
+{
+  "products": [
+    {
+      "product_code": "30_YEAR_FIXED",
+      "program": "CONVENTIONAL",
+      "term_years": 30,
+      "min_fico": 620,
+      "max_ltv": 97,
+      "tags": ["FIXED", "CONFORMING"],
+      "estimated_note_rate": 6.5
+    },
+    {
+      "product_code": "7_6_SOFR_ARM",
+      "program": "CONVENTIONAL",
+      "term_years": 30,
+      "min_fico": 640,
+      "max_ltv": 90,
+      "tags": ["ARM", "CONFORMING"],
+      "estimated_note_rate": 6.125
+    },
+    {
+      "product_code": "30_YEAR_FIXED_HIGH_BALANCE",
+      "program": "CONVENTIONAL",
+      "term_years": 30,
+      "min_fico": 660,
+      "max_ltv": 90,
+      "tags": ["FIXED", "HIGH_BALANCE"],
+      "estimated_note_rate": 6.625
+    },
+    {
+      "product_code": "FHA_30_YEAR_FIXED",
+      "program": "FHA",
+      "term_years": 30,
+      "min_fico": 580,
+      "max_ltv": 96.5,
+      "tags": ["FIXED", "GOVERNMENT"],
+      "estimated_note_rate": 6.25
+    },
+    {
+      "product_code": "VA_30_YEAR_FIXED",
+      "program": "VA",
+      "term_years": 30,
+      "min_fico": 620,
+      "max_ltv": 100,
+      "tags": ["FIXED", "GOVERNMENT"],
+      "estimated_note_rate": 6.0
+    },
+    {
+      "product_code": "JUMBO_30_YEAR_FIXED",
+      "program": "JUMBO",
+      "term_years": 30,
+      "min_fico": 700,
+      "max_ltv": 85,
+      "tags": ["FIXED", "JUMBO"],
+      "estimated_note_rate": 6.875
+    }
+  ]
+}

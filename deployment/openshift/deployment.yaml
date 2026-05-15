@@ -1,0 +1,47 @@
+# MCP references: (OpenShift deployment — serves all MCP tools on mounted `/mcp` route)
+# Purpose: Example Deployment for running the mortgage MCP server behind OpenShift Routes.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mortgage-mcp-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mortgage-mcp-server
+  template:
+    metadata:
+      labels:
+        app: mortgage-mcp-server
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: mortgage-mcp-server
+          image: mortgage-mcp-server:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          env:
+            - name: PORT
+              value: "8080"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"

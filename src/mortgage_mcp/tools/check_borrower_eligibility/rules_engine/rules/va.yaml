@@ -1,0 +1,6 @@
+program: VA
+min_credit_score: 620
+max_dti: 50.0
+max_ltv_purchase: 100.0
+pmi_ltv_threshold: null
+notes: "Mock VA thresholds — funding fee and entitlement not modeled here."

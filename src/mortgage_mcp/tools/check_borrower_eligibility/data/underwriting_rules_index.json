@@ -1,0 +1,8 @@
+{
+  "rules_index": [
+    { "loan_type": "CONVENTIONAL", "path": "rules_engine/rules/conventional.yaml", "version": "2026.05.01" },
+    { "loan_type": "FHA", "path": "rules_engine/rules/fha.yaml", "version": "2026.05.01" },
+    { "loan_type": "VA", "path": "rules_engine/rules/va.yaml", "version": "2026.05.01" },
+    { "loan_type": "JUMBO", "path": "rules_engine/rules/jumbo.yaml", "version": "2026.05.01" }
+  ]
+}

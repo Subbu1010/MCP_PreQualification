@@ -1,0 +1,13 @@
+# MCP references: (repository hygiene — not imported by MCP tools)
+# Purpose: Ignore local virtualenvs, caches, secrets, and generated artifacts.
+
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.env
+*.egg-info/
+dist/
+build/

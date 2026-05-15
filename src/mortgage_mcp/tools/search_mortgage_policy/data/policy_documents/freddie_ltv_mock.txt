@@ -1,0 +1,5 @@
+FREDDIE MAC (MOCK EXCERPT FOR RAG TESTING ONLY)
+
+LTV limits vary by occupancy and loan purpose. Primary residences generally receive
+more favorable maximum LTV treatment than second homes or investment properties.
+Subordinate financing must be included when calculating CLTV for eligibility.

@@ -1,0 +1,12 @@
+{
+  "borrowers": [
+    {
+      "borrower_id": "BRW-10001",
+      "extra_monthly_debts": 0
+    },
+    {
+      "borrower_id": "BRW-10002",
+      "extra_monthly_debts": 350
+    }
+  ]
+}

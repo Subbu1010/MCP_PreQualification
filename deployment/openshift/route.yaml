@@ -1,0 +1,14 @@
+# MCP references: (OpenShift Route — external HTTPS entry; MCP Streamable HTTP at `/mcp`)
+# Purpose: Example Route exposing the FastAPI app (adjust host TLS for your bank environment).
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: mortgage-mcp-server
+spec:
+  to:
+    kind: Service
+    name: mortgage-mcp-server
+  port:
+    targetPort: http
+  tls:
+    termination: edge

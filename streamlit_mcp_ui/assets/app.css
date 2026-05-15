@@ -1,0 +1,349 @@
+/**
+ * MCP references: (Streamlit UI — global styles only)
+ * Purpose: Production-grade visual layer on top of Streamlit’s layout (typography, surfaces, tables, sidebar).
+ */
+
+/* --- Design tokens (align with .streamlit/config.toml theme) --- */
+:root {
+  --mm-navy: #0f172a;
+  --mm-navy-mid: #1e293b;
+  --mm-blue: #1d4ed8;
+  --mm-blue-soft: #eff6ff;
+  --mm-border: #e2e8f0;
+  --mm-muted: #64748b;
+  --mm-card: #ffffff;
+  --mm-radius: 12px;
+  --mm-radius-sm: 8px;
+  --mm-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
+  --mm-shadow-lg: 0 10px 40px -12px rgba(15, 23, 42, 0.15);
+}
+
+/* --- App shell --- */
+[data-testid="stAppViewContainer"] > .main {
+  background: linear-gradient(165deg, #f8fafc 0%, #f1f5f9 45%, #eef2ff 100%);
+}
+
+.block-container {
+  padding-top: 2.25rem !important;
+  padding-bottom: 3rem !important;
+  max-width: 1200px;
+}
+
+/* Header bar */
+[data-testid="stHeader"] {
+  background: linear-gradient(90deg, #0f172a 0%, #1e3a5f 55%, #1e40af 100%) !important;
+  box-shadow: var(--mm-shadow);
+}
+
+[data-testid="stHeader"] [data-testid="stDecoration"] {
+  display: none;
+}
+
+/* --- Sidebar (connection panel) --- */
+[data-testid="stSidebar"] {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+[data-testid="stSidebar"] .block-container {
+  padding-top: 1.75rem !important;
+}
+
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] span:not([style*="color"]),
+[data-testid="stSidebar"] p {
+  color: #cbd5e1 !important;
+}
+
+[data-testid="stSidebar"] .stMarkdown h3,
+[data-testid="stSidebar"] .stMarkdown strong {
+  color: #f8fafc !important;
+}
+
+[data-testid="stSidebar"] input {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid rgba(15, 23, 42, 0.15) !important;
+  border-radius: var(--mm-radius-sm) !important;
+}
+
+[data-testid="stSidebar"] .stButton > button {
+  width: 100%;
+  background: rgba(59, 130, 246, 0.25) !important;
+  color: #e0f2fe !important;
+  border: 1px solid rgba(96, 165, 250, 0.35) !important;
+}
+
+[data-testid="stSidebar"] .stButton > button:hover {
+  background: rgba(59, 130, 246, 0.45) !important;
+  border-color: rgba(147, 197, 253, 0.55) !important;
+}
+
+[data-testid="stSidebar"] [data-baseweb="select"] > div {
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+/* --- Typography (main) --- */
+.main h1 {
+  font-weight: 700 !important;
+  letter-spacing: -0.03em !important;
+  color: var(--mm-navy) !important;
+  font-size: 2rem !important;
+  line-height: 1.2 !important;
+}
+
+.main h2,
+.main h3,
+.main h4 {
+  color: var(--mm-navy-mid) !important;
+  font-weight: 600 !important;
+}
+
+.main .stCaption,
+.main [data-testid="stCaptionContainer"] {
+  color: var(--mm-muted) !important;
+}
+
+/* --- Page header block (injected HTML) --- */
+.mm-page-header {
+  background: var(--mm-card);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  box-shadow: var(--mm-shadow);
+  padding: 1.75rem 2rem 1.5rem;
+  margin-bottom: 1.75rem;
+  border-left: 4px solid var(--mm-blue);
+}
+
+.mm-page-kicker {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--mm-muted);
+  margin: 0 0 0.35rem 0;
+  font-weight: 600;
+}
+
+.mm-page-header h1 {
+  margin: 0 0 0.5rem 0 !important;
+  padding: 0 !important;
+  font-size: 1.85rem !important;
+  color: var(--mm-navy) !important;
+}
+
+.mm-page-desc {
+  margin: 0;
+  color: var(--mm-muted);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  max-width: 52rem;
+}
+
+/* --- Hero (home) --- */
+.mm-hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 40%, #2563eb 100%);
+  color: #f8fafc;
+  border-radius: var(--mm-radius);
+  padding: 2.25rem 2.25rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--mm-shadow-lg);
+}
+
+.mm-hero h1,
+.main .mm-hero h1 {
+  color: #f8fafc !important;
+  font-size: 2.1rem !important;
+  margin: 0 0 0.75rem 0 !important;
+}
+
+.mm-hero p {
+  color: rgba(248, 250, 252, 0.88);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 40rem;
+}
+
+.mm-hero-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 0.25rem 0.85rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* --- Feature cards (home) --- */
+.mm-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.mm-feature-card {
+  background: var(--mm-card);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius-sm);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--mm-shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.mm-feature-card:hover {
+  box-shadow: var(--mm-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.mm-feature-card h3 {
+  margin: 0 0 0.4rem 0 !important;
+  font-size: 1rem !important;
+  color: var(--mm-navy) !important;
+}
+
+.mm-feature-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--mm-muted);
+  line-height: 1.45;
+}
+
+/* --- Buttons --- */
+.stButton > button {
+  border-radius: var(--mm-radius-sm) !important;
+  font-weight: 600 !important;
+  padding: 0.55rem 1.25rem !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease !important;
+}
+
+.stButton > button[kind="primary"] {
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%) !important;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35) !important;
+}
+
+.stButton > button[kind="primary"]:hover {
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45) !important;
+}
+
+/* --- Metrics --- */
+[data-testid="stMetric"] {
+  background: var(--mm-card) !important;
+  border: 1px solid var(--mm-border) !important;
+  border-radius: var(--mm-radius-sm) !important;
+  padding: 1rem 1.15rem !important;
+  box-shadow: var(--mm-shadow) !important;
+}
+
+[data-testid="stMetric"] label {
+  font-size: 0.68rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: var(--mm-muted) !important;
+}
+
+[data-testid="stMetric"] [data-testid="stMetricValue"] {
+  color: var(--mm-navy) !important;
+  font-weight: 700 !important;
+}
+
+/* --- Forms & inputs --- */
+[data-testid="stForm"] {
+  background: var(--mm-card);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  padding: 1.5rem 1.75rem 1.75rem !important;
+  box-shadow: var(--mm-shadow);
+}
+
+[data-testid="stVerticalBlock"] > div > [data-testid="stExpander"] {
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius-sm);
+  overflow: hidden;
+}
+
+/* --- Dataframes / tables --- */
+[data-testid="stDataFrame"],
+[data-testid="stDataEditor"] {
+  border: 1px solid var(--mm-border) !important;
+  border-radius: var(--mm-radius-sm) !important;
+  overflow: hidden;
+}
+
+/* --- Alerts --- */
+.stAlert {
+  border-radius: var(--mm-radius-sm) !important;
+  border: 1px solid var(--mm-border) !important;
+}
+
+div[data-testid="stSuccessNotification"] {
+  border-radius: var(--mm-radius-sm) !important;
+}
+
+/* --- Dividers --- */
+hr {
+  margin: 2rem 0 !important;
+  border: none !important;
+  border-top: 1px solid var(--mm-border) !important;
+}
+
+/* --- Results panel --- */
+.mm-results-panel {
+  background: var(--mm-card);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  padding: 1.5rem 1.75rem;
+  margin-top: 1.5rem;
+  box-shadow: var(--mm-shadow);
+}
+
+.mm-results-panel h4 {
+  margin-top: 0 !important;
+}
+
+/* --- Footer chrome (optional production polish) --- */
+footer {
+  visibility: hidden;
+}
+
+#MainMenu {
+  visibility: hidden;
+}
+
+/* --- Sidebar brand (injected HTML) --- */
+.mm-sidebar-brand {
+  padding: 0.15rem 0 1.2rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.mm-sidebar-product {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #f8fafc !important;
+  letter-spacing: -0.02em;
+}
+
+.mm-sidebar-sub {
+  margin: 0.2rem 0 0 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #94a3b8 !important;
+}
+
+.mm-sidebar-hint {
+  font-size: 0.78rem;
+  color: #94a3b8 !important;
+  margin: 0.35rem 0 0.75rem 0;
+  line-height: 1.45;
+}
+
+.mm-sidebar-hint strong {
+  color: #e2e8f0 !important;
+}

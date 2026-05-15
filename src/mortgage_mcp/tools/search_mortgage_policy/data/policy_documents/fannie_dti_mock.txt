@@ -1,0 +1,6 @@
+FANNIE MAE (MOCK EXCERPT FOR RAG TESTING ONLY)
+
+Debt-to-income ratios must align with the risk assessment performed by the automated
+underwriting system. Higher housing expense ratios may be permitted when residual income
+and reserves demonstrate capacity. Manual underwriting overlays may apply for investment
+properties and cash-out refinances.

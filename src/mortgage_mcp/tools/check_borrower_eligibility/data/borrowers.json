@@ -1,0 +1,24 @@
+{
+  "borrowers": [
+    {
+      "borrower_id": "BRW-10001",
+      "display_name": "Alex Rivera",
+      "credit_score": 720,
+      "annual_income": 125000,
+      "monthly_non_housing_debts": 950,
+      "reserves_months": 6,
+      "first_time_buyer": true,
+      "military_status": "NONE"
+    },
+    {
+      "borrower_id": "BRW-10002",
+      "display_name": "Jordan Lee",
+      "credit_score": 660,
+      "annual_income": 98000,
+      "monthly_non_housing_debts": 2850,
+      "reserves_months": 1.5,
+      "first_time_buyer": false,
+      "military_status": "NONE"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+program: FHA
+min_credit_score: 580
+max_dti: 50.0
+max_ltv_purchase: 96.5
+pmi_ltv_threshold: null
+notes: "Mock FHA thresholds — not an endorsement of program eligibility."

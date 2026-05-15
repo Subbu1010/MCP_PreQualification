@@ -1,0 +1,6 @@
+FHA (MOCK EXCERPT FOR RAG TESTING ONLY — NOT OFFICIAL HUD TEXT)
+
+Borrowers with decision credit scores at or above 580 may be eligible for maximum
+96.5 percent LTV on purchase transactions, subject to documented assets and automated
+underwriting findings. Borrowers with scores below 580 are generally limited to
+90 percent LTV unless additional compensating factors are documented in the loan file.

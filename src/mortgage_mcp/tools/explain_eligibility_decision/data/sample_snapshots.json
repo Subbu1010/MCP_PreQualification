@@ -1,0 +1,15 @@
+{
+  "sample_declined_snapshot": {
+    "eligible": false,
+    "status": "DECLINED",
+    "dti_ratio": 52.1,
+    "ltv_ratio": 88.0,
+    "loan_type": "CONVENTIONAL",
+    "failed_rules": [
+      { "rule_id": "CONV_MAX_DTI", "severity": "FAIL", "message": "DTI 52.1% > 45.0%" }
+    ],
+    "policy_references": [
+      { "id": "FNMA-B3-6-02", "title": "Debt-to-income ratios (mock)", "excerpt_id": "CHUNK-FNMA-1182" }
+    ]
+  }
+}

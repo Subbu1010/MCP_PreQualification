@@ -1,0 +1,6 @@
+program: JUMBO
+min_credit_score: 700
+max_dti: 43.0
+max_ltv_purchase: 85.0
+pmi_ltv_threshold: 80.0
+notes: "Mock jumbo / non-agency thresholds."
