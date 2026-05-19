@@ -281,6 +281,91 @@ def show_explain_result(out: dict[str, Any]) -> None:
         _technical_payload(out)
 
 
+def show_payment_estimate_result(out: dict[str, Any]) -> None:
+    if render_tool_error(out):
+        return
+    with st.container(border=True):
+        st.success("Monthly payment estimated.")
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Total PITIA", f"${out.get('total_monthly_payment', 0):,.2f}")
+        c2.metric("P&I", f"${out.get('principal_and_interest', 0):,.2f}")
+        c3.metric("Escrow", f"${out.get('monthly_escrow', 0):,.2f}")
+        c4.metric("MI (mock)", f"${out.get('monthly_pmi', 0):,.2f}")
+        st.info(out.get("explanation", "—"))
+        if out.get("ltv_ratio") is not None:
+            st.caption(f"Implied LTV: **{out.get('ltv_ratio')}%**")
+        _technical_payload(out)
+
+
+def show_reserves_result(out: dict[str, Any]) -> None:
+    if render_tool_error(out):
+        return
+    with st.container(border=True):
+        meets = bool(out.get("meets_guideline"))
+        st.success("Reserves evaluated.") if meets else st.warning("Reserves below mock guideline.")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Required months", out.get("required_months", "—"))
+        c2.metric("Available months", out.get("available_months", "—"))
+        c3.metric("Required $", f"${out.get('required_dollars', 0):,.0f}")
+        st.info(out.get("explanation", "—"))
+        _technical_payload(out)
+
+
+def show_max_affordable_result(out: dict[str, Any]) -> None:
+    if render_tool_error(out):
+        return
+    with st.container(border=True):
+        st.success("Maximum affordable loan estimated.")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Max loan", f"${out.get('max_loan_amount', 0):,.0f}")
+        c2.metric("Max housing / mo", f"${out.get('max_total_housing_payment', 0):,.2f}")
+        c3.metric("Target DTI", f"{out.get('target_dti_percent', '—')}%")
+        st.info(out.get("explanation", "—"))
+        _technical_payload(out)
+
+
+def show_compare_programs_result(out: dict[str, Any]) -> None:
+    if render_tool_error(out):
+        return
+    with st.container(border=True):
+        st.success("Program comparison ready.")
+        st.caption(out.get("explanation", "—"))
+        rows = out.get("comparisons") or []
+        if rows:
+            display = [
+                {
+                    "Program": r.get("program"),
+                    "Eligible": r.get("eligible"),
+                    "Status": r.get("status"),
+                    "DTI %": r.get("dti_ratio"),
+                    "LTV %": r.get("ltv_ratio"),
+                    "Max DTI": r.get("max_dti"),
+                    "Max LTV": r.get("max_ltv_purchase"),
+                    "FICO": r.get("borrower_credit_score"),
+                }
+                for r in rows
+            ]
+            st.dataframe(display, use_container_width=True, hide_index=True)
+        _technical_payload(out)
+
+
+def show_prequal_summary_result(out: dict[str, Any]) -> None:
+    if render_tool_error(out):
+        return
+    with st.container(border=True):
+        st.success("Prequalification summary generated.")
+        summary = out.get("summary") or {}
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Status", str(summary.get("status", "—")))
+        c2.metric("DTI", f"{summary.get('dti_ratio', '—')}%")
+        c3.metric("LTV", f"{summary.get('ltv_ratio', '—')}%")
+        c4.metric("Risk", str(summary.get("risk_level", "—")))
+        st.info(out.get("explanation", "—"))
+        st.markdown("##### Packet")
+        st.json(summary)
+        _technical_payload(out)
+
+
 def show_generic_exception(exc: BaseException) -> None:
     with st.container(border=True):
         st.error(

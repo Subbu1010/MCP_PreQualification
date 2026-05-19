@@ -36,11 +36,16 @@ features = [
     ("4 · Recommend products", "Illustrative product ranking for the scenario."),
     ("5 · Search policy", "Natural-language search over mock policy excerpts."),
     ("6 · Explain decision", "Narrative explanation for approve / decline outcomes."),
+    ("7 · Estimate payment", "P&I, escrow, and illustrative MI for monthly PITIA."),
+    ("8 · Reserves", "Post-close reserves vs program guideline months."),
+    ("9 · Max affordable loan", "Reverse-solve loan from income and target DTI."),
+    ("10 · Compare programs", "CONVENTIONAL vs FHA vs VA vs JUMBO matrix."),
+    ("11 · Prequal summary", "One-call eligibility + reserves + products packet."),
 ]
 
-cols = st.columns(3)
+cols = st.columns(4)
 for i, (title, desc) in enumerate(features):
-    with cols[i % 3]:
+    with cols[i % 4]:
         with st.container(border=True):
             st.markdown(f"**{html.escape(title)}**")
             st.caption(desc)

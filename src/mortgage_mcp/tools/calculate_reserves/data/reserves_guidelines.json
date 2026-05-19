@@ -1,0 +1,8 @@
+{
+  "programs": {
+    "CONVENTIONAL": { "min_months": 2.0, "label": "Conventional (mock)" },
+    "FHA": { "min_months": 2.0, "label": "FHA (mock)" },
+    "VA": { "min_months": 2.0, "label": "VA (mock)" },
+    "JUMBO": { "min_months": 6.0, "label": "Jumbo (mock)" }
+  }
+}

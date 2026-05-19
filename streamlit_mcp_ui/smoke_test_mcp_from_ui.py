@@ -22,7 +22,7 @@ def main() -> None:
     print(f"MCP_SERVER_URL={url}")
 
     tools = list_tools_sync()
-    print(f"list_tools: OK ({len(tools)} tools)")
+    print(f"list_tools: OK ({len(tools)} tools, expected 11)")
     print(tools)
 
     checks = [
@@ -69,6 +69,55 @@ def main() -> None:
                 "query": "FHA minimum credit score for 96.5 percent LTV purchase",
                 "sources": ["FHA"],
                 "top_k": 3,
+            },
+        ),
+        (
+            "mortgage_estimate_monthly_payment",
+            {
+                "loan_amount": 450000,
+                "annual_interest_rate": 6.5,
+                "term_years": 30,
+                "monthly_property_tax": 450,
+                "monthly_insurance": 125,
+                "monthly_hoa": 0,
+                "loan_type": "CONVENTIONAL",
+                "appraised_value": 550000,
+            },
+        ),
+        (
+            "mortgage_calculate_reserves",
+            {
+                "borrower_id": "BRW-10001",
+                "application_id": "APP-50021",
+                "loan_type": "CONVENTIONAL",
+            },
+        ),
+        (
+            "mortgage_max_affordable_loan_amount",
+            {
+                "gross_monthly_income": 10416.67,
+                "monthly_non_mortgage_debts": 950,
+                "target_dti_percent": 45.0,
+                "annual_interest_rate": 6.5,
+                "term_years": 30,
+                "monthly_escrow": 575,
+                "loan_type": "CONVENTIONAL",
+            },
+        ),
+        (
+            "mortgage_compare_loan_programs",
+            {
+                "borrower_id": "BRW-10001",
+                "application_id": "APP-50021",
+            },
+        ),
+        (
+            "mortgage_generate_prequal_summary",
+            {
+                "borrower_id": "BRW-10001",
+                "application_id": "APP-50021",
+                "loan_type": "CONVENTIONAL",
+                "include_product_recommendations": True,
             },
         ),
         (

@@ -1,13 +1,16 @@
 # Mortgage Eligibility & Prequalification MCP Server
 
 <!--
-MCP references: mortgage_calculate_dti, mortgage_calculate_ltv, mortgage_check_borrower_eligibility,
-                 mortgage_recommend_loan_products, mortgage_search_mortgage_policy,
-                 mortgage_explain_eligibility_decision
-Purpose: Operator documentation for running the FastAPI host, calling MCP tools, and tracing code paths.
+MCP references: mortgage_calculate_dti, mortgage_calculate_ltv, mortgage_estimate_monthly_payment,
+                 mortgage_calculate_reserves, mortgage_max_affordable_loan_amount,
+                 mortgage_check_borrower_eligibility, mortgage_compare_loan_programs,
+                 mortgage_recommend_loan_products, mortgage_generate_prequal_summary,
+                 mortgage_search_mortgage_policy, mortgage_explain_eligibility_decision
 -->
 
-Enterprise-style **Model Context Protocol** server for mortgage **prequalification** simulations: DTI/LTV math, mock eligibility, product recommendations, FAISS policy search, and Gemini-backed (or offline mock) explanations.
+Enterprise-style **Model Context Protocol** server for mortgage **prequalification** simulations: DTI/LTV math, monthly payment and affordability, reserves, mock eligibility, program comparison, product recommendations, consolidated prequal packets, FAISS policy search, and Gemini-backed (or offline mock) explanations.
+
+All MCP tools are registered with the `mortgage_` prefix and declared via `@mcp.tool(...)` with `ToolAnnotations(title="mortgage", readOnlyHint=True)`.
 
 ## Requirements
 
@@ -28,64 +31,41 @@ On Windows, if `python` points to the wrong version:
 py -3.12 -m pip install -e ".[dev]"
 ```
 
-## Start the MCP server
+---
 
-### 1. Open a terminal at the repo root
+## Quick start (MCP server + Streamlit UI)
 
-```text
-d:\Study\MCP_PreQualification
-```
+Use **two terminals**. Both must target the same MCP URL: `http://127.0.0.1:8080/mcp`.
 
-### 2. (Optional) Configure environment
-
-```bash
-copy .env.sample .env
-```
-
-Edit `.env` only if you want live Gemini or Google embeddings. The server runs without API keys using mock/hash fallbacks.
-
-### 3. Start Uvicorn
-
-**Windows (recommended):**
+### Terminal 1 — MCP server
 
 ```powershell
 cd d:\Study\MCP_PreQualification
 py -3.12 -m uvicorn mortgage_mcp.main:app --host 127.0.0.1 --port 8080
 ```
 
-**Linux / macOS:**
-
-```bash
-cd /path/to/MCP_PreQualification
-uvicorn mortgage_mcp.main:app --host 0.0.0.0 --port 8080
-```
-
-**Alternative entrypoint** (same app, reads `HOST` / `PORT` from the environment):
-
-```bash
-py -3.12 -m mortgage_mcp.run
-```
-
-Leave this terminal open while clients connect.
-
-### 4. Verify the server is up
-
-| Check | URL / command | Expected |
-|-------|----------------|----------|
-| Health | `GET http://127.0.0.1:8080/health` | `{"status":"ok"}` |
-| Readiness (FAISS warmed) | `GET http://127.0.0.1:8080/ready` | `{"status":"ready"}` |
-| OpenAPI | http://127.0.0.1:8080/docs | FastAPI Swagger UI |
-| MCP endpoint | http://127.0.0.1:8080/mcp | Streamable HTTP MCP (used by clients) |
-
-Quick health check (PowerShell):
+Verify:
 
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8080/health
 ```
 
-### 5. Smoke-test all six tools (optional)
+Expected: `{"status":"ok"}`.
 
-With the server running, from `streamlit_mcp_ui/`:
+### Terminal 2 — Streamlit UI
+
+```powershell
+cd d:\Study\MCP_PreQualification\streamlit_mcp_ui
+pip install -r requirements.txt
+$env:MCP_SERVER_URL="http://127.0.0.1:8080/mcp"
+py -3.12 -m streamlit run Home.py
+```
+
+Open http://localhost:8501. In the sidebar, set **Service URL** to `http://127.0.0.1:8080/mcp` and click **Test connection** — you should see **11** tools.
+
+### Smoke test (optional)
+
+With the MCP server running:
 
 ```powershell
 cd streamlit_mcp_ui
@@ -93,32 +73,88 @@ $env:MCP_SERVER_URL="http://127.0.0.1:8080/mcp"
 py -3.12 smoke_test_mcp_from_ui.py
 ```
 
-You should see `list_tools: OK (6 tools)` and `All tool calls succeeded`.
+Expected: `list_tools: OK (11 tools, expected 11)` and `All tool calls succeeded`.
 
-### Endpoints summary
+> **Restart after code changes:** Stop and restart Uvicorn so new or renamed tools are loaded. An old process may still expose only 6 tools.
 
-- **MCP (Streamable HTTP):** `http://127.0.0.1:8080/mcp` — mount path for all `tools/call` traffic
-- **Health:** `GET /health`
-- **Readiness:** `GET /ready` (policy FAISS index for `mortgage_search_mortgage_policy`)
-- **OpenAPI:** `GET /docs`
+---
 
-### Request flow (all tools)
+## Start the MCP server (detail)
+
+### 1. Repository root
+
+```text
+d:\Study\MCP_PreQualification
+```
+
+### 2. (Optional) Environment
+
+```powershell
+copy .env.sample .env
+```
+
+Edit `.env` only for live Gemini or Google embeddings. The server runs without API keys.
+
+### 3. Uvicorn
+
+**Windows:**
+
+```powershell
+py -3.12 -m uvicorn mortgage_mcp.main:app --host 127.0.0.1 --port 8080
+```
+
+**Linux / macOS:**
+
+```bash
+uvicorn mortgage_mcp.main:app --host 0.0.0.0 --port 8080
+```
+
+**Alternative** (`HOST` / `PORT` from environment):
+
+```bash
+py -3.12 -m mortgage_mcp.run
+```
+
+### Endpoints
+
+| Check | URL | Expected |
+|-------|-----|----------|
+| Health | `GET http://127.0.0.1:8080/health` | `{"status":"ok"}` |
+| Readiness | `GET http://127.0.0.1:8080/ready` | `{"status":"ready"}` (FAISS warmed) |
+| OpenAPI | http://127.0.0.1:8080/docs | Swagger UI |
+| MCP | http://127.0.0.1:8080/mcp | Streamable HTTP (`tools/list`, `tools/call`) |
+
+### Request flow
 
 ```text
 Client  →  POST /mcp  →  src/mortgage_mcp/main.py
-                              └─ transport/tool_registry.py  (registers tools)
-                                   └─ tools/<name>/tool.py     (@mcp.tool handler)
-                                        └─ tools/<name>/service.py  (business logic)
-                                             └─ data/, rules/, rag/, ai_provider/  (per tool)
+                              └─ transport/tool_registry.py
+                                   └─ tools/<name>/tool.py      (@mcp.tool)
+                                        └─ tools/<name>/service.py
+                                             └─ data/ | rules/ | rag/ | ai_provider/
 ```
+
+Registration order in `tool_registry.py`:
+
+1. `mortgage_calculate_dti`
+2. `mortgage_calculate_ltv`
+3. `mortgage_estimate_monthly_payment`
+4. `mortgage_calculate_reserves`
+5. `mortgage_max_affordable_loan_amount`
+6. `mortgage_check_borrower_eligibility`
+7. `mortgage_compare_loan_programs`
+8. `mortgage_recommend_loan_products`
+9. `mortgage_generate_prequal_summary`
+10. `mortgage_search_mortgage_policy`
+11. `mortgage_explain_eligibility_decision`
 
 ---
 
 ## How to call MCP tools
 
-MCP clients use **Streamable HTTP** at `MCP_SERVER_URL` (default `http://127.0.0.1:8080/mcp`). Each call is `tools/call` with the tool **name** and a JSON **arguments** object.
+Clients use **Streamable HTTP** at `MCP_SERVER_URL` (default `http://127.0.0.1:8080/mcp`). Each call is `tools/call` with the tool **name** and a JSON **arguments** object.
 
-### Python example (same client as Streamlit)
+### Python example
 
 ```python
 import asyncio
@@ -146,36 +182,39 @@ async def main():
 asyncio.run(main())
 ```
 
-Or run the bundled smoke test: `streamlit_mcp_ui/smoke_test_mcp_from_ui.py`.
-
-### Mock IDs that work across tools
+### Mock IDs (shared fixtures)
 
 | Field | Sample value | Used by |
 |-------|----------------|---------|
-| `borrower_id` | `BRW-10001` (approved path), `BRW-10002` (declined path) | eligibility, recommend, optional DTI |
-| `application_id` | `APP-50021` (with `BRW-10001`), `APP-50022` (with `BRW-10002`) | eligibility, recommend |
-| `loan_type` | `CONVENTIONAL`, `FHA`, `VA`, `JUMBO` | eligibility |
+| `borrower_id` | `BRW-10001` (strong), `BRW-10002` (stressed) | eligibility, recommend, reserves, compare, summary |
+| `application_id` | `APP-50021` (+ `BRW-10001`), `APP-50022` (+ `BRW-10002`) | same |
+| `loan_type` | `CONVENTIONAL`, `FHA`, `VA`, `JUMBO` | eligibility, reserves, compare, summary |
 
-Fixture files live under each tool’s `data/` folder (see per-tool sections below).
+Primary fixture files: `src/mortgage_mcp/tools/check_borrower_eligibility/data/borrowers.json` and `loan_applications.json`.
 
 ---
 
 ## MCP tools reference
 
-| MCP tool name | Title | Description |
-|---------------|-------|-------------|
-| `mortgage_calculate_dti` | Calculate DTI | Front-end or back-end DTI from income and obligations |
-| `mortgage_calculate_ltv` | Calculate LTV | LTV / CLTV from loan amount, value, and subordinate financing |
-| `mortgage_check_borrower_eligibility` | Check Borrower Eligibility | Mock underwriting pre-check with explainable rules |
-| `mortgage_recommend_loan_products` | Recommend Loan Products | Ranked mock product catalog |
-| `mortgage_search_mortgage_policy` | Search Mortgage Policy | FAISS retrieval over local policy excerpts |
-| `mortgage_explain_eligibility_decision` | Explain Eligibility Decision | Narrative explanation (Gemini or offline mock) |
+| MCP tool name | Streamlit page | Description |
+|---------------|----------------|-------------|
+| `mortgage_calculate_dti` | 1 · Calculate DTI | Front-end or back-end DTI |
+| `mortgage_calculate_ltv` | 2 · Calculate LTV | LTV / CLTV |
+| `mortgage_estimate_monthly_payment` | 7 · Estimate payment | P&I, escrow, illustrative MI, PITIA |
+| `mortgage_calculate_reserves` | 8 · Reserves | Reserves months/dollars vs guideline |
+| `mortgage_max_affordable_loan_amount` | 9 · Max affordable loan | Max loan from income and target DTI |
+| `mortgage_check_borrower_eligibility` | 3 · Check eligibility | Mock underwriting pre-check |
+| `mortgage_compare_loan_programs` | 10 · Compare programs | CONV / FHA / VA / JUMBO matrix |
+| `mortgage_recommend_loan_products` | 4 · Recommend products | Ranked mock catalog |
+| `mortgage_generate_prequal_summary` | 11 · Prequal summary | Eligibility + reserves + products packet |
+| `mortgage_search_mortgage_policy` | 5 · Search policy | FAISS policy retrieval |
+| `mortgage_explain_eligibility_decision` | 6 · Explain decision | Narrative explanation (Gemini or mock) |
 
 ---
 
-### `mortgage_calculate_dti`
+## Per-tool samples and code paths
 
-**Sample arguments** (known working values from smoke test):
+### `mortgage_calculate_dti`
 
 ```json
 {
@@ -187,28 +226,13 @@ Fixture files live under each tool’s `data/` folder (see per-tool sections bel
 }
 ```
 
-`dti_method`: `BACK_END` or `FRONT_END`. `borrower_id` is optional; when set, extra debts may be loaded from this tool’s mock overrides file.
+`dti_method`: `BACK_END` or `FRONT_END`. Optional `borrower_id` loads `tools/calculate_dti/data/borrower_overrides.json`.
 
-**Python call:**
-
-```python
-await session.call_tool("mortgage_calculate_dti", { ... })
-```
-
-**Files invoked (in order):**
-
-1. `src/mortgage_mcp/transport/tool_registry.py` — registers handler
-2. `src/mortgage_mcp/tools/calculate_dti/tool.py` — MCP entry (`@mcp.tool`)
-3. `src/mortgage_mcp/tools/calculate_dti/service.py` — `run_calculate_dti()`
-4. `src/mortgage_mcp/tools/calculate_dti/schemas.py` — input/output validation
-5. `src/mortgage_mcp/common/calc/dti.py` — DTI math
-6. `src/mortgage_mcp/tools/calculate_dti/data/borrower_overrides.json` — optional, if `borrower_id` is sent
+**Path:** `tool.py` → `service.py` → `schemas.py` → `common/calc/dti.py`
 
 ---
 
 ### `mortgage_calculate_ltv`
-
-**Sample arguments:**
 
 ```json
 {
@@ -219,25 +243,30 @@ await session.call_tool("mortgage_calculate_dti", { ... })
 }
 ```
 
-**Python call:**
-
-```python
-await session.call_tool("mortgage_calculate_ltv", { ... })
-```
-
-**Files invoked (in order):**
-
-1. `src/mortgage_mcp/transport/tool_registry.py`
-2. `src/mortgage_mcp/tools/calculate_ltv/tool.py`
-3. `src/mortgage_mcp/tools/calculate_ltv/service.py` — `run_calculate_ltv()`
-4. `src/mortgage_mcp/tools/calculate_ltv/schemas.py`
-5. `src/mortgage_mcp/common/calc/ltv.py` — LTV / CLTV math
+**Path:** `tool.py` → `service.py` → `schemas.py` → `common/calc/ltv.py`
 
 ---
 
-### `mortgage_check_borrower_eligibility`
+### `mortgage_estimate_monthly_payment`
 
-**Sample arguments** (approved scenario):
+```json
+{
+  "loan_amount": 450000,
+  "annual_interest_rate": 6.5,
+  "term_years": 30,
+  "monthly_property_tax": 450,
+  "monthly_insurance": 125,
+  "monthly_hoa": 0,
+  "loan_type": "CONVENTIONAL",
+  "appraised_value": 550000
+}
+```
+
+**Path:** `tool.py` → `service.py` → `common/calc/payment.py`, `common/calc/ltv.py`
+
+---
+
+### `mortgage_calculate_reserves`
 
 ```json
 {
@@ -247,33 +276,64 @@ await session.call_tool("mortgage_calculate_ltv", { ... })
 }
 ```
 
-**Declined scenario** (for testing): `BRW-10002` + `APP-50022` + `CONVENTIONAL`.
+Alternatively pass `liquid_assets_usd` + `monthly_pitia`, or `reserves_months_available` + `monthly_pitia`.
 
-**Python call:**
+**Path:** `tool.py` → `service.py` → `data/reserves_guidelines.json`, eligibility `data/borrowers.json`, `loan_applications.json`
 
-```python
-await session.call_tool("mortgage_check_borrower_eligibility", { ... })
+---
+
+### `mortgage_max_affordable_loan_amount`
+
+```json
+{
+  "gross_monthly_income": 10416.67,
+  "monthly_non_mortgage_debts": 950,
+  "target_dti_percent": 45.0,
+  "annual_interest_rate": 6.5,
+  "term_years": 30,
+  "monthly_escrow": 575,
+  "loan_type": "CONVENTIONAL"
+}
 ```
 
-**Files invoked (in order):**
+**Path:** `tool.py` → `service.py` → `common/calc/payment.py`
 
-1. `src/mortgage_mcp/transport/tool_registry.py`
-2. `src/mortgage_mcp/tools/check_borrower_eligibility/tool.py`
-3. `src/mortgage_mcp/tools/check_borrower_eligibility/service.py` — `run_check_borrower_eligibility()`
-4. `src/mortgage_mcp/tools/check_borrower_eligibility/schemas.py`
-5. `src/mortgage_mcp/tools/check_borrower_eligibility/data/borrowers.json`
-6. `src/mortgage_mcp/tools/check_borrower_eligibility/data/loan_applications.json`
-7. `src/mortgage_mcp/tools/check_borrower_eligibility/data/underwriting_rules_index.json`
-8. `src/mortgage_mcp/tools/check_borrower_eligibility/rules_engine/loader.py` — loads YAML rules
-9. `src/mortgage_mcp/tools/check_borrower_eligibility/rules_engine/rules/*.yaml` — e.g. `conventional.yaml`
-10. `src/mortgage_mcp/tools/check_borrower_eligibility/rules_engine/evaluator.py`
-11. `src/mortgage_mcp/common/calc/dti.py`, `src/mortgage_mcp/common/calc/ltv.py`
+---
+
+### `mortgage_check_borrower_eligibility`
+
+Approved:
+
+```json
+{
+  "borrower_id": "BRW-10001",
+  "application_id": "APP-50021",
+  "loan_type": "CONVENTIONAL"
+}
+```
+
+Declined test: `BRW-10002` + `APP-50022` + `CONVENTIONAL`.
+
+**Path:** `tool.py` → `service.py` → `data/*.json` → `rules_engine/loader.py` → `rules/*.yaml` → `evaluator.py` → `common/calc/dti.py`, `ltv.py`
+
+---
+
+### `mortgage_compare_loan_programs`
+
+```json
+{
+  "borrower_id": "BRW-10001",
+  "application_id": "APP-50021"
+}
+```
+
+Optional `programs` list (defaults to all four). Returns side-by-side eligible/status/DTI/LTV per program.
+
+**Path:** `tool.py` → `service.py` → eligibility `data/*`, `rules_engine/*`, `common/calc/dti.py`, `ltv.py`
 
 ---
 
 ### `mortgage_recommend_loan_products`
-
-**Sample arguments:**
 
 ```json
 {
@@ -285,27 +345,28 @@ await session.call_tool("mortgage_check_borrower_eligibility", { ... })
 }
 ```
 
-**Python call:**
+**Path:** `tool.py` → `service.py` → `data/borrowers.json`, `loan_applications.json`, `mortgage_products.json`
 
-```python
-await session.call_tool("mortgage_recommend_loan_products", { ... })
+---
+
+### `mortgage_generate_prequal_summary`
+
+```json
+{
+  "borrower_id": "BRW-10001",
+  "application_id": "APP-50021",
+  "loan_type": "CONVENTIONAL",
+  "include_product_recommendations": true
+}
 ```
 
-**Files invoked (in order):**
+Orchestrates eligibility, reserves, and (optionally) product recommendation services in one response.
 
-1. `src/mortgage_mcp/transport/tool_registry.py`
-2. `src/mortgage_mcp/tools/recommend_loan_products/tool.py`
-3. `src/mortgage_mcp/tools/recommend_loan_products/service.py` — `run_recommend_loan_products()`
-4. `src/mortgage_mcp/tools/recommend_loan_products/schemas.py`
-5. `src/mortgage_mcp/tools/recommend_loan_products/data/borrowers.json`
-6. `src/mortgage_mcp/tools/recommend_loan_products/data/loan_applications.json`
-7. `src/mortgage_mcp/tools/recommend_loan_products/data/mortgage_products.json`
+**Path:** `tool.py` → `service.py` → `check_borrower_eligibility`, `calculate_reserves`, `recommend_loan_products` services
 
 ---
 
 ### `mortgage_search_mortgage_policy`
-
-**Sample arguments:**
 
 ```json
 {
@@ -315,32 +376,13 @@ await session.call_tool("mortgage_recommend_loan_products", { ... })
 }
 ```
 
-`sources` is optional (omit to search all loaded policy documents).
+`sources` is optional.
 
-**Python call:**
-
-```python
-await session.call_tool("mortgage_search_mortgage_policy", { ... })
-```
-
-**Files invoked (in order):**
-
-1. `src/mortgage_mcp/main.py` — on startup, `init_policy_index()` warms FAISS
-2. `src/mortgage_mcp/transport/tool_registry.py`
-3. `src/mortgage_mcp/tools/search_mortgage_policy/tool.py`
-4. `src/mortgage_mcp/tools/search_mortgage_policy/service.py` — `run_search_mortgage_policy()`
-5. `src/mortgage_mcp/tools/search_mortgage_policy/rag/retrieval.py` — `search_policy()`
-6. `src/mortgage_mcp/tools/search_mortgage_policy/bootstrap.py` — index + embeddings
-7. `src/mortgage_mcp/tools/search_mortgage_policy/embeddings/hash_embedding.py` or `google_embeddings.py`
-8. `src/mortgage_mcp/tools/search_mortgage_policy/vector_store/faiss_store.py`
-9. `src/mortgage_mcp/tools/search_mortgage_policy/data/policy_manifest.json`
-10. `src/mortgage_mcp/tools/search_mortgage_policy/data/policy_documents/*` — FHA, FNMA, Freddie, CFPB, internal mocks
+**Path:** `main.py` (`init_policy_index` on startup) → `tool.py` → `service.py` → `rag/retrieval.py` → `bootstrap.py` → embeddings + `vector_store/faiss_store.py` → `data/policy_documents/*`
 
 ---
 
 ### `mortgage_explain_eligibility_decision`
-
-**Sample arguments** (minimal declined snapshot):
 
 ```json
 {
@@ -369,33 +411,41 @@ await session.call_tool("mortgage_search_mortgage_policy", { ... })
 }
 ```
 
-You can also pass the JSON returned from `mortgage_check_borrower_eligibility` as `eligibility_snapshot`. More examples: `src/mortgage_mcp/tools/explain_eligibility_decision/data/sample_snapshots.json`.
+You may pass the JSON from `mortgage_check_borrower_eligibility`. More samples: `tools/explain_eligibility_decision/data/sample_snapshots.json`.
 
-**Python call:**
-
-```python
-await session.call_tool("mortgage_explain_eligibility_decision", { ... })
-```
-
-**Files invoked (in order):**
-
-1. `src/mortgage_mcp/transport/tool_registry.py`
-2. `src/mortgage_mcp/tools/explain_eligibility_decision/tool.py`
-3. `src/mortgage_mcp/tools/explain_eligibility_decision/service.py` — `run_explain_eligibility_decision()`
-4. `src/mortgage_mcp/tools/explain_eligibility_decision/schemas.py`
-5. `src/mortgage_mcp/tools/explain_eligibility_decision/ai_provider/vertex_gemini_provider.py` — live Gemini when configured
-6. Offline mock path in the same service when `GOOGLE_API_KEY` is unset
+**Path:** `tool.py` → `service.py` → `ai_provider/vertex_gemini_provider.py` (or offline mock)
 
 ---
 
 ## Repository layout
 
-- `src/mortgage_mcp/main.py` — FastAPI app; mounts MCP at `/mcp`
-- `src/mortgage_mcp/transport/tool_registry.py` — builds FastMCP and registers all tools
-- `src/mortgage_mcp/common/` — shared math, settings, logging, errors
-- `src/mortgage_mcp/tools/<tool_name>/` — one folder per MCP tool (`tool.py` + `service.py` + `data/`)
+```
+src/mortgage_mcp/
+  main.py                    # FastAPI app, mounts /mcp
+  run.py                     # uvicorn entrypoint
+  transport/tool_registry.py # registers all @mcp.tool handlers
+  common/
+    calc/dti.py, ltv.py, payment.py
+    errors/, logging/, schemas/, types/
+  tools/
+    calculate_dti/
+    calculate_ltv/
+    estimate_monthly_payment/
+    calculate_reserves/
+    max_affordable_loan_amount/
+    check_borrower_eligibility/
+    compare_loan_programs/
+    recommend_loan_products/
+    generate_prequal_summary/
+    search_mortgage_policy/
+    explain_eligibility_decision/
+streamlit_mcp_ui/            # Streamlit console (pages 1–11)
+tests/
+```
 
-To remove a tool: delete its folder and remove its `register_*` line in `tool_registry.py`.
+To add a tool: create `tools/<name>/` (`tool.py`, `service.py`, `schemas.py`), add `register_tools` in `tool_registry.py`.
+
+To remove a tool: delete its folder and its `register_*` line in `tool_registry.py`.
 
 ## Docker / OpenShift
 
@@ -408,18 +458,24 @@ To remove a tool: delete its folder and remove its `register_*` line in `tool_re
 pytest
 ```
 
-## Optional: Streamlit UI
+Includes service-layer tests for all eleven tools and payment amortization helpers.
 
-A browser console for calling every MCP tool lives in **`streamlit_mcp_ui/`**. See `streamlit_mcp_ui/README.md`.
+## Streamlit UI
 
-1. Start the MCP server (above) on port **8080**.
-2. In another terminal:
+Browser console in **`streamlit_mcp_ui/`** — see `streamlit_mcp_ui/README.md` for UI-specific setup.
 
-```powershell
-cd streamlit_mcp_ui
-pip install -r requirements.txt
-$env:MCP_SERVER_URL="http://127.0.0.1:8080/mcp"
-streamlit run Home.py
-```
+| Page file | MCP tool |
+|-----------|----------|
+| `pages/1_calculate_dti.py` | `mortgage_calculate_dti` |
+| `pages/2_calculate_ltv.py` | `mortgage_calculate_ltv` |
+| `pages/3_check_borrower_eligibility.py` | `mortgage_check_borrower_eligibility` |
+| `pages/4_recommend_loan_products.py` | `mortgage_recommend_loan_products` |
+| `pages/5_search_mortgage_policy.py` | `mortgage_search_mortgage_policy` |
+| `pages/6_explain_eligibility_decision.py` | `mortgage_explain_eligibility_decision` |
+| `pages/7_estimate_monthly_payment.py` | `mortgage_estimate_monthly_payment` |
+| `pages/8_calculate_reserves.py` | `mortgage_calculate_reserves` |
+| `pages/9_max_affordable_loan_amount.py` | `mortgage_max_affordable_loan_amount` |
+| `pages/10_compare_loan_programs.py` | `mortgage_compare_loan_programs` |
+| `pages/11_generate_prequal_summary.py` | `mortgage_generate_prequal_summary` |
 
-Set **Service URL** in the sidebar to `http://127.0.0.1:8080/mcp` and use **Test connection** to list the six `mortgage_*` tools.
+Default form values use demo personas **Alex Rivera** (`BRW-10001` / `APP-50021`) and **Jordan Lee** (`BRW-10002` / `APP-50022`).

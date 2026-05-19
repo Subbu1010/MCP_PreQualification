@@ -60,8 +60,13 @@ Or use the sidebar URL field on **Home** or each tool page (it updates `os.envir
 |------|-----------|
 | Calculate DTI | `mortgage_calculate_dti` |
 | Calculate LTV | `mortgage_calculate_ltv` |
+| Estimate monthly payment | `mortgage_estimate_monthly_payment` |
+| Calculate reserves | `mortgage_calculate_reserves` |
+| Max affordable loan | `mortgage_max_affordable_loan_amount` |
 | Check borrower eligibility | `mortgage_check_borrower_eligibility` |
+| Compare loan programs | `mortgage_compare_loan_programs` |
 | Recommend loan products | `mortgage_recommend_loan_products` |
+| Generate prequal summary | `mortgage_generate_prequal_summary` |
 | Search mortgage policy | `mortgage_search_mortgage_policy` |
 | Explain eligibility decision | `mortgage_explain_eligibility_decision` |
 
