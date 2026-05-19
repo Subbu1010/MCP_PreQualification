@@ -40,7 +40,7 @@ if submitted:
     if scope:
         payload["sources"] = scope
     try:
-        out = call_mcp_tool("search_mortgage_policy", payload)
+        out = call_mcp_tool("mortgage_search_mortgage_policy", payload)
         show_policy_search_result(out)
     except Exception as exc:  # noqa: BLE001
         show_generic_exception(exc)

@@ -49,7 +49,7 @@ async def run_explain_eligibility_decision(raw: dict[str, Any]) -> dict[str, Any
 
     return {
         "success": True,
-        "tool": "explain_eligibility_decision",
+        "tool": "mortgage_explain_eligibility_decision",
         "correlation_id": correlation_id,
         "model_id": model_id,
         "narrative": narrative,

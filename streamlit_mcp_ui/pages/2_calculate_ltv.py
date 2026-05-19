@@ -48,7 +48,7 @@ with st.container(border=True):
 if submitted:
     try:
         out = call_mcp_tool(
-            "calculate_ltv",
+            "mortgage_calculate_ltv",
             {
                 "loan_amount": loan,
                 "appraised_value": value,

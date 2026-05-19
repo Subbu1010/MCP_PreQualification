@@ -137,7 +137,7 @@ if submitted:
 
     try:
         out = call_mcp_tool(
-            "explain_eligibility_decision",
+            "mortgage_explain_eligibility_decision",
             {"eligibility_snapshot": snap, "language": language},
         )
         show_explain_result(out)

@@ -77,7 +77,7 @@ if submitted:
     if bid:
         payload["borrower_id"] = bid
     try:
-        out = call_mcp_tool("calculate_dti", payload)
+        out = call_mcp_tool("mortgage_calculate_dti", payload)
         show_dti_result(out)
     except Exception as exc:  # noqa: BLE001
         show_generic_exception(exc)

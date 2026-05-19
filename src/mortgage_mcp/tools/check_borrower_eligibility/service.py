@@ -124,7 +124,7 @@ async def run_check_borrower_eligibility(raw: dict) -> dict:
 
     return {
         "success": True,
-        "tool": "check_borrower_eligibility",
+        "tool": "mortgage_check_borrower_eligibility",
         "correlation_id": correlation_id,
         "eligible": eligible,
         "status": status.value,

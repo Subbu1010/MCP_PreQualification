@@ -46,7 +46,7 @@ if submitted:
     borrower_id, application_id, _ = scenario
     try:
         out = call_mcp_tool(
-            "check_borrower_eligibility",
+            "mortgage_check_borrower_eligibility",
             {
                 "borrower_id": borrower_id,
                 "application_id": application_id,

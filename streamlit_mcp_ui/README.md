@@ -58,12 +58,12 @@ Or use the sidebar URL field on **Home** or each tool page (it updates `os.envir
 
 | Page | MCP tool |
 |------|-----------|
-| Calculate DTI | `calculate_dti` |
-| Calculate LTV | `calculate_ltv` |
-| Check borrower eligibility | `check_borrower_eligibility` |
-| Recommend loan products | `recommend_loan_products` |
-| Search mortgage policy | `search_mortgage_policy` |
-| Explain eligibility decision | `explain_eligibility_decision` |
+| Calculate DTI | `mortgage_calculate_dti` |
+| Calculate LTV | `mortgage_calculate_ltv` |
+| Check borrower eligibility | `mortgage_check_borrower_eligibility` |
+| Recommend loan products | `mortgage_recommend_loan_products` |
+| Search mortgage policy | `mortgage_search_mortgage_policy` |
+| Explain eligibility decision | `mortgage_explain_eligibility_decision` |
 
 Default JSON on each page matches the **mock borrowers/applications** in the MCP server repo (`BRW-10001`, `APP-50021`, etc.).
 

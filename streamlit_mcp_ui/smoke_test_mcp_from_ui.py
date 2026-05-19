@@ -27,7 +27,7 @@ def main() -> None:
 
     checks = [
         (
-            "calculate_dti",
+            "mortgage_calculate_dti",
             {
                 "borrower_id": "BRW-10001",
                 "gross_monthly_income": 10416.67,
@@ -37,7 +37,7 @@ def main() -> None:
             },
         ),
         (
-            "calculate_ltv",
+            "mortgage_calculate_ltv",
             {
                 "loan_amount": 450000,
                 "appraised_value": 550000,
@@ -46,7 +46,7 @@ def main() -> None:
             },
         ),
         (
-            "check_borrower_eligibility",
+            "mortgage_check_borrower_eligibility",
             {
                 "borrower_id": "BRW-10001",
                 "application_id": "APP-50021",
@@ -54,7 +54,7 @@ def main() -> None:
             },
         ),
         (
-            "recommend_loan_products",
+            "mortgage_recommend_loan_products",
             {
                 "borrower_id": "BRW-10001",
                 "application_id": "APP-50021",
@@ -64,7 +64,7 @@ def main() -> None:
             },
         ),
         (
-            "search_mortgage_policy",
+            "mortgage_search_mortgage_policy",
             {
                 "query": "FHA minimum credit score for 96.5 percent LTV purchase",
                 "sources": ["FHA"],
@@ -72,7 +72,7 @@ def main() -> None:
             },
         ),
         (
-            "explain_eligibility_decision",
+            "mortgage_explain_eligibility_decision",
             {
                 "eligibility_snapshot": {
                     "eligible": False,

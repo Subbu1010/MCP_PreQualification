@@ -120,7 +120,7 @@ async def run_recommend_loan_products(raw: dict) -> dict:
 
     return {
         "success": True,
-        "tool": "recommend_loan_products",
+        "tool": "mortgage_recommend_loan_products",
         "correlation_id": correlation_id,
         "recommendations": recommendations,
         "ruleset_version": RULESET_VERSION,

@@ -35,7 +35,7 @@ async def run_search_mortgage_policy(raw: dict[str, Any]) -> dict[str, Any]:
     hits = await search_policy(query=query, sources=sources, top_k=top_k)
     return {
         "success": True,
-        "tool": "search_mortgage_policy",
+        "tool": "mortgage_search_mortgage_policy",
         "correlation_id": correlation_id,
         "index_version": index_version(),
         "hits": hits,
